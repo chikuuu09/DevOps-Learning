@@ -1,15 +1,24 @@
+
 ###########################################
 # BASE IMAGE
 ###########################################
 
-FROM ubuntu AS build
+FROM python:3.12-slim
 
-RUN apt-get update && apt-get install -y golang-go
+###########################################
+# WORKING DIRECTORY
+###########################################
 
-ENV GO111MODULE=off
+WORKDIR /app
 
-COPY . .
+###########################################
+# COPY PYTHON CODE
+###########################################
 
-RUN CGO_ENABLED=0 go build -o /app .
+COPY calculator.py .
 
-ENTRYPOINT ["/app"]
+###########################################
+# RUN CALCULATOR
+###########################################
+
+ENTRYPOINT ["python", "-u", "calculator.py"]
