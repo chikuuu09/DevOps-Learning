@@ -1,25 +1,26 @@
+
 ###########################################
-# BASE IMAGE
+# BASE IMAGE - BUILD STAGE
 ###########################################
 
-FROM ubuntu AS build
+FROM python:3.12-slim AS build
 
-RUN apt-get update && apt-get install -y golang-go
+WORKDIR /app
 
-ENV GO111MODULE=off
+COPY calculator.py .
 
-COPY . .
+###########################################
+# MULTI-STAGE BUILD
+###########################################
 
-RUN CGO_ENABLED=0 go build -o /app .
+FROM python:3.12-slim
 
-############################################
-# HERE STARTS THE MAGIC OF MULTI STAGE BUILD
-############################################
+WORKDIR /app
 
-FROM scratch
+COPY --from=build /app/calculator.py .
 
-# Copy the compiled binary from the build stage
-COPY --from=build /app /app
+###########################################
+# RUN THE APPLICATION
+###########################################
 
-# Set the entrypoint for the container to run the binary
-ENTRYPOINT ["/app"]
+ENTRYPOINT ["python", "-u", "calculator.py"]
